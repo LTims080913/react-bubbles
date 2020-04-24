@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
+import {useHistory} from 'react-router-dom'
 
 const initialColor = {
   color: "",
@@ -10,6 +11,7 @@ const ColorList = ({ colors, updateColors }) => {
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const {go, push} = useHistory()
 
   const editColor = color => {
     setEditing(true);
@@ -17,14 +19,37 @@ const ColorList = ({ colors, updateColors }) => {
   };
 
   const saveEdit = e => {
-    e.preventDefault();
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
-  };
+    e.preventDefault();
+    const body = {...colorToEdit}
+    const {id} = colorToEdit
+    axiosWithAuth()
+    .put(`/api/colors/${id}`, body)
+    .then(res => console.log(res))
+    .catch(error => console.log('YIKES!!!', error))
 
+    colorsUpdate();
+   
+    setEditing();
+  };
+  const colorsUpdate = () => {
+    axiosWithAuth()
+    .get('/api/colors')
+    .then(res => {
+      updateColors(res.data)
+    })
+    .catch(error => console.log('YIKES', error))
+  }
   const deleteColor = color => {
     // make a delete request to delete this color
+    axiosWithAuth()
+    .delete(`/api/colors/${color.id}`, color)
+    .then(res => console.log('You have just deleted: ', res))
+    .catch(error => console.log('Snap, Crackle, POP!!! You could not delete it!', error ))
+    go(0)
+    
   };
 
   return (

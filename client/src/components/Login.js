@@ -23,7 +23,7 @@ const Login = props => {
     .then(res => {
       console.log({res})
       localStorage.setItem('token', res.data.payload)
-      props.history.push('/bubble-page')
+      props.history.push('/bubbles')
     })
     .catch(error => {
       console.log('Your bubble has been burst', error)
